@@ -1,0 +1,20 @@
+#include"printprimefactor.h"
+
+void consumer(struct WorkFile *workfile) // I EAT THINGS!!!
+{
+        for(int i = 1; i < workfile->argc; i++)
+        {
+                int numToFactor;
+                sem_wait(&workfile->full);
+                pthread_mutex_lock(&workfile->mutex);
+                /********************* entering critical section *********************/
+                while(workfile->counter == 0){}; //Do nothing
+                numToFactor = workfile->buffer[workfile->out];
+                printPF(workfile);
+                workfile->out = (workfile->out + 1) % BUFFER_SIZE;
+                workfile->counter--;
+                /********************** exiting critical section *********************/
+                pthread_mutex_unlock(&workfile->mutex);
+                sem_post(&workfile->empty);
+        }
+}

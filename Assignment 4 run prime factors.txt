@@ -1,0 +1,17 @@
+
+void runPF(struct WorkFile *workfile) // I AM THE GUTS!!!
+{
+        int numToFactor = workfile->buffer[workfile->in];
+        int c = 0;
+        for(int i = 2; i <= numToFactor; i++)
+        {
+                while(numToFactor % i == 0 && numToFactor != 1)
+                {
+                        workfile->primefactors[workfile->in][c] = i;
+                        numToFactor = numToFactor / i;
+                        c++;
+                }
+        }
+        workfile->primefactors[workfile->in][c] = -1;
+}
+

@@ -1,0 +1,54 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<pthread.h>
+#include<semaphore.h>
+#include"structurefile.h"
+#include"producer.h"
+#include"consumer.h"
+
+
+void initNums(struct WorkFile *workfile);
+void destroy(struct WorkFile *workfile);
+
+int main(int argc, char **argv)
+{
+        struct WorkFile workfile; // my workfile structure
+        pthread_t thread_producer;
+        pthread_t thread_consumer;
+        workfile.argc = argc; // initialize the count of input from command line
+        workfile.argv = argv; // initialize the number of array items from the command line
+
+        if(argc == 1)
+        {
+                fprintf(stderr, "Please enter one or more: <integer value>\n\n"); //need to enter an integer;
+                return -1;
+        }
+
+        initNums(&workfile); // initialize numbers in my workfile
+
+        pthread_create(&thread_producer, NULL, (void *)producer, &workfile); // create producer thread
+        pthread_create(&thread_consumer, NULL, (void *)consumer, &workfile); // create consumer thread
+
+        pthread_join(thread_producer, NULL);
+        pthread_join(thread_consumer, NULL);
+
+        destroy(&workfile); // free the semaphores - FLY BE FREE!!!!
+}
+
+void initNums(struct WorkFile *workfile) // method to initialize variables
+{
+        printf("intializing the numbers... \n\n");
+        pthread_mutex_init(&workfile->mutex, NULL);
+        sem_init(&workfile->empty, 0, BUFFER_SIZE);
+        sem_init(&workfile->full, 0, 0);
+        workfile->in = 0;
+        workfile->out = 0;
+        workfile->counter = 0;
+}
+
+void destroy(struct WorkFile *workfile) // method to free the semaphores
+{
+        pthread_mutex_destroy(&workfile->mutex);
+        sem_destroy(&workfile->empty);
+        sem_destroy(&workfile->full);
+}

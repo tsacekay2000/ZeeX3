@@ -1,0 +1,12 @@
+void printPF(struct WorkFile *workfile) //SHOW ME THE MONEY!!!
+{
+        int c = 0;11
+        printf("The number to factor is: %d, the prime factors are: ", workfile->buffer[workfile->out]);
+        while(workfile->primefactors[workfile->out][c] != -1)
+        {
+                printf("%d ", workfile->primefactors[workfile->out][c]);
+                c++;
+        }
+        printf("\n");
+}
+

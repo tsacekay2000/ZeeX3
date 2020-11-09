@@ -1,0 +1,21 @@
+#include"runprimefactor.h"
+
+void producer(struct WorkFile *workfile) // I am the GREAT PRODUCER!!!!
+{
+        for(int i = 1; i < workfile->argc; i++)
+        {
+                int numToFactor = atoi(workfile->argv[i]);
+
+                sem_wait(&workfile->empty);
+                pthread_mutex_lock(&workfile->mutex);
+                /******************** entering critical section ********************/
+                while(workfile->counter == BUFFER_SIZE){}; //Do nothing
+                workfile->buffer[workfile->in] = numToFactor;
+                runPF(workfile);
+                workfile->in = (workfile->in + 1) % BUFFER_SIZE;
+                workfile->counter++;
+                /********************** exiting critical section *******************/
+                pthread_mutex_unlock(&workfile->mutex);
+                sem_post(&workfile->full);
+        }
+}

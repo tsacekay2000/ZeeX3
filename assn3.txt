@@ -1,0 +1,78 @@
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// this is the thread function to calculate the prime factors
+void *runPF(void *numIn) // threads call this function
+{
+        int factors[10]; // array to hold factor results
+        int c = 0;
+        int numToFact = atoi(numIn); // cast to integer
+
+        for (int i = 2; i <= numToFact; i++)
+        {
+                while (numToFact % i == 0 && numToFact != 1)
+                {
+                        factors[c] = i;
+                        c++;
+                        numToFact = numToFact / i;
+                }
+        }
+
+        int *buf = malloc(c * sizeof(int));vi
+        memcpy(buf, factors, sizeof(int) * c); // copy values of the pointers
+        return (void*) buf;
+}
+
+int main(int argc, char *argv[])
+{
+        void *values; // create generic pointer
+        pthread_t tid[argc]; // the thread identifier
+        pthread_attr_t attr; // set of thread attributes
+        if (argc == 1)
+        {
+                fprintf(stderr,"Please enter one or more: <integer value>\n"); // need to enter an integer
+                return -1;
+        }
+
+        pthread_attr_init(&attr); // get the default attributes
+        printf("\n\n");
+
+        for (int zed = 1; zed < argc; zed++) // for loop to create the threads for parallel processes
+        {
+                pthread_create(&tid[zed], &attr, runPF, argv[zed]);
+        }
+
+        for (int x = 1; x < argc; x++) // for loop to join the threads, fill the values and print the results in parallel processes
+        {
+                if (atoi(argv[x]) < 1)
+                {
+                        fprintf(stderr, "You entered %d, the value must be > 0\n", atoi(argv[x])); // error message for negative value
+                }
+                else
+                {
+                        pthread_join(tid[x], &values);
+                        int *values_array = values;
+                        int check = 1;
+
+                        printf("Factors for %d: ", atoi(argv[x]));
+                        for (int y = 0; y < sizeof(values); y++)
+                        {
+                                check = check * values_array[y]; // value for garbage check
+				 if (values_array[y] == 0 || check > atoi(argv[x])) // if statement, don't print garbage
+                                {
+                                        break;
+                                }
+                                else
+                                {
+                                        printf("%d ", values_array[y]);
+                                }
+                        }
+                        printf("\n");
+                }
+        }
+        printf("\n\n");
+        pthread_exit(NULL); // terminate the thread
+}
+                                                                          
